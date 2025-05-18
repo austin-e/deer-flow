@@ -210,27 +210,25 @@ DeerFlow implements a modular multi-agent system architecture designed for autom
 ![Architecture Diagram](./assets/architecture.png)
 > See it live at [deerflow.tech](https://deerflow.tech/#multi-agent-architecture)
 
-The system employs a streamlined workflow with the following components:
+The system now employs a hub-based workflow with the following components:
 
-1. **Coordinator**: The entry point that manages the workflow lifecycle
-   - Initiates the research process based on user input
-   - Delegates tasks to the planner when appropriate
-   - Acts as the primary interface between the user and the system
+1. **Orchestrator**
+   - Assigns tasks to agents based on user goals
+   - Coordinates overall execution flow
 
-2. **Planner**: Strategic component for task decomposition and planning
-   - Analyzes research objectives and creates structured execution plans
-   - Determines if enough context is available or if more research is needed
-   - Manages the research flow and decides when to generate the final report
+2. **Secretary Hub**
+   - Receives reports from agents and performs basic processing
+   - Publishes all outputs to the shared bulletin
+   - Designed to scale horizontally because it stores no state beyond the bulletin reference
 
-3. **Research Team**: A collection of specialized agents that execute the plan:
-   - **Researcher**: Conducts web searches and information gathering using tools like web search engines, crawling and even MCP services.
-   - **Coder**: Handles code analysis, execution, and technical tasks using Python REPL tool.
-   Each agent has access to specific tools optimized for their role and operates within the LangGraph framework
+3. **Bulletin**
+   - Acts as the shared stream for all communications
+   - Maintains the full history of agent reports and orchestration messages
 
-4. **Reporter**: Final stage processor for research outputs
-   - Aggregates findings from the research team
-   - Processes and structures the collected information
-   - Generates comprehensive research reports
+4. **Agents**
+   - **Researcher** and **Coder** perform domain-specific work
+   - Agents never communicate directly with one another; all interactions pass through the orchestrator and secretary
+   - Results reported by agents are stored in the bulletin for later reference
 
 ## Text-to-Speech Integration
 
