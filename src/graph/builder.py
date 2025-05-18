@@ -7,6 +7,8 @@ from langgraph.checkpoint.memory import MemorySaver
 from .types import State
 from .nodes import (
     coordinator_node,
+    orchestrator_node,
+    secretary_node,
     planner_node,
     reporter_node,
     research_team_node,
@@ -20,16 +22,19 @@ from .nodes import (
 def _build_base_graph():
     """Build and return the base state graph with all nodes and edges."""
     builder = StateGraph(State)
-    builder.add_edge(START, "coordinator")
+    builder.add_edge(START, "orchestrator")
+    builder.add_node("orchestrator", orchestrator_node)
     builder.add_node("coordinator", coordinator_node)
     builder.add_node("background_investigator", background_investigation_node)
     builder.add_node("planner", planner_node)
     builder.add_node("reporter", reporter_node)
+    builder.add_node("secretary", secretary_node)
     builder.add_node("research_team", research_team_node)
     builder.add_node("researcher", researcher_node)
     builder.add_node("coder", coder_node)
     builder.add_node("human_feedback", human_feedback_node)
-    builder.add_edge("reporter", END)
+    builder.add_edge("reporter", "secretary")
+    builder.add_edge("secretary", END)
     return builder
 
 

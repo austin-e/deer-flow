@@ -26,11 +26,17 @@ from src.llms.llm import get_llm_by_type
 from src.prompts.planner_model import Plan, StepType
 from src.prompts.template import apply_prompt_template
 from src.utils.json_utils import repair_json_output
+from src.hubs import Bulletin, Secretary, Orchestrator
 
 from .types import State
 from ..config import SEARCH_MAX_RESULTS
 
 logger = logging.getLogger(__name__)
+
+# Shared hubs used across all nodes
+_bulletin = Bulletin()
+_secretary = Secretary(_bulletin)
+_orchestrator = Orchestrator()
 
 
 @tool
@@ -66,6 +72,17 @@ def background_investigation_node(state: State) -> Command[Literal["planner"]]:
         },
         goto="planner",
     )
+
+
+def orchestrator_node(state: State) -> Command[Literal["planner"]]:
+    """Orchestrator node that assigns tasks to agents."""
+    logger.info("Orchestrator assigning tasks")
+    tasks = state.get("tasks", [])
+    if not tasks:
+        task = {"agent": "planner", "task": state["messages"][-1].content}
+        _orchestrator.assign(task["agent"], task["task"])
+        tasks.append(task)
+    return Command(update={"tasks": tasks}, goto="planner")
 
 
 def planner_node(
@@ -273,6 +290,14 @@ def reporter_node(state: State):
     logger.info(f"reporter response: {response_content}")
 
     return {"final_report": response_content}
+
+
+def secretary_node(state: State):
+    """Secretary node that publishes reports to the bulletin."""
+    logger.info("Secretary publishing report to bulletin")
+    report = state.get("final_report", "")
+    entry = _secretary.handle_report("reporter", report)
+    return {"bulletin_history": _bulletin.history(), "last_entry": entry}
 
 
 def research_team_node(
