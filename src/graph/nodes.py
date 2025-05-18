@@ -80,7 +80,10 @@ def orchestrator_node(state: State) -> Command[Literal["planner"]]:
     tasks = state.get("tasks", [])
     if not tasks:
         task = {"agent": "planner", "task": state["messages"][-1].content}
-        _orchestrator.assign(task["agent"], task["task"])
+        assignment = _orchestrator.assign(
+            task["agent"], task["task"], AGENT_LLM_MAP.get("planner")
+        )
+        task.update({"llm_type": assignment["llm_type"]})
         tasks.append(task)
     return Command(update={"tasks": tasks}, goto="planner")
 
@@ -110,20 +113,17 @@ def planner_node(
             }
         ]
 
-    if AGENT_LLM_MAP["planner"] == "basic":
-        llm = get_llm_by_type(AGENT_LLM_MAP["planner"]).with_structured_output(
-            Plan,
-            method="json_mode",
-        )
-    else:
-        llm = get_llm_by_type(AGENT_LLM_MAP["planner"])
+    planner_llm_type = AGENT_LLM_MAP["planner"]
+    llm = get_llm_by_type(planner_llm_type)
+    if planner_llm_type in ("basic", "reasoning"):
+        llm = llm.with_structured_output(Plan, method="json_mode")
 
     # if the plan iterations is greater than the max plan iterations, return the reporter node
     if plan_iterations >= configurable.max_plan_iterations:
         return Command(goto="reporter")
 
     full_response = ""
-    if AGENT_LLM_MAP["planner"] == "basic":
+    if planner_llm_type in ("basic", "reasoning"):
         response = llm.invoke(messages)
         full_response = response.model_dump_json(indent=4, exclude_none=True)
     else:

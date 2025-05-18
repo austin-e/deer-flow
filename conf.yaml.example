@@ -7,3 +7,10 @@ BASIC_MODEL:
   base_url: https://ark.cn-beijing.volces.com/api/v3
   model: "doubao-1-5-pro-32k-250115"
   api_key: xxxx
+
+# An example configuration for reasoning-capable models
+# Replace with your reasoning model details or remove if not used
+REASONING_MODEL:
+  base_url: https://api.openai.com/v1
+  model: "gpt-4o"
+  api_key: xxxx
