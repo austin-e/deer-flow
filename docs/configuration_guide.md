@@ -11,11 +11,11 @@ cp conf.yaml.example conf.yaml
 
 ## Which models does DeerFlow support?
 
-In DeerFlow, currently we only support non-reasoning models, which means models like OpenAI's o1/o3 or DeepSeek's R1 are not supported yet, but we will add support for them in the future.
+DeerFlow supports both standard chat models and reasoning models. Reasoning models such as OpenAI's `o1`/`o3` or DeepSeek's `r1` can now be configured using the `REASONING_MODEL` section in `conf.yaml`.
 
 ### Supported Models
 
-`doubao-1.5-pro-32k-250115`, `gpt-4o`, `qwen-max-latest`, `gemini-2.0-flash`, `deepseek-v3`, and theoretically any other non-reasoning chat models that implement the OpenAI API specification.
+`doubao-1.5-pro-32k-250115`, `gpt-4o`, `qwen-max-latest`, `gemini-2.0-flash`, `deepseek-v3`, and theoretically any other chat model that implements the OpenAI API specification. Reasoning-capable models should be configured under `REASONING_MODEL`.
 
 > [!NOTE]
 > The Deep Research process requires the model to have a **longer context window**, which is not supported by all models.

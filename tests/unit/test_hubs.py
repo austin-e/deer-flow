@@ -1,4 +1,5 @@
 from src.hubs import Bulletin, Secretary, Orchestrator
+from src.config.agents import AGENT_LLM_MAP
 
 
 def test_bulletin_post_and_history():
@@ -21,3 +22,4 @@ def test_orchestrator_assign():
     assert task in orchestrator.task_queue
     assert task["agent"] == "agent"
     assert task["task"] == "do work"
+    assert task["llm_type"] == AGENT_LLM_MAP.get("agent", "basic")

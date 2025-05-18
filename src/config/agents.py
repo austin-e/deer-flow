@@ -9,7 +9,7 @@ LLMType = Literal["basic", "reasoning", "vision"]
 # Define agent-LLM mapping
 AGENT_LLM_MAP: dict[str, LLMType] = {
     "coordinator": "basic",
-    "planner": "basic",
+    "planner": "reasoning",
     "researcher": "basic",
     "coder": "basic",
     "reporter": "basic",
